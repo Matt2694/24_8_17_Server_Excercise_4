@@ -21,11 +21,11 @@ namespace _24_8_17_Server_Excercise_4
 
             //using Sockets
 
-            server.Run(IPAddress.Loopback, 5000);
+            //server.Run(IPAddress.Loopback, 5000);
 
             //using Tcp
 
-            //server.Run();
+            server.Run();
         }
 
         private void Run(IPAddress ip, int port)
@@ -71,26 +71,26 @@ namespace _24_8_17_Server_Excercise_4
         {
             //using Sockets
 
-            Console.WriteLine("Waiting for incoming client connections...");
-            HandleClient clientHandler;
-            while (true)
-            {
-                Socket newSocket = s.Accept();
-                clientHandler = new HandleClient(newSocket);
-                clientList.Add(new Thread(new ThreadStart(clientHandler.EchoHandler)));
-                clientList[clientList.Count - 1].Start();
-            }
-
-            //using Tcp
-
             //Console.WriteLine("Waiting for incoming client connections...");
             //HandleClient clientHandler;
             //while (true)
             //{
-            //    clientHandler = new HandleClient(listener.AcceptTcpClient());
+            //    Socket newSocket = s.Accept();
+            //    clientHandler = new HandleClient(newSocket);
             //    clientList.Add(new Thread(new ThreadStart(clientHandler.EchoHandler)));
             //    clientList[clientList.Count - 1].Start();
             //}
+
+            //using Tcp
+
+            Console.WriteLine("Waiting for incoming client connections...");
+            HandleClient clientHandler;
+            while (true)
+            {
+                clientHandler = new HandleClient(listener.AcceptTcpClient());
+                clientList.Add(new Thread(new ThreadStart(clientHandler.EchoHandler)));
+                clientList[clientList.Count - 1].Start();
+            }
         }
     }
 }

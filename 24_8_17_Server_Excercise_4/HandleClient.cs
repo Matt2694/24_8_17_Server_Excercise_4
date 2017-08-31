@@ -23,111 +23,95 @@ namespace _24_8_17_Server_Excercise_4
             clSock = newSocket;
         }
 
-        private void DoDialog()
+        private byte[] ReceiveFromClient()
         {
-
+            byte[] buffer = new byte[1024];
+            clSock.Receive(buffer);
+            return buffer;
         }
 
-        private void ExecuteCommand()
+        private void SendToClient(string str)
         {
-
-        }
-
-        private void ReceiveFromClient()
-        {
-
-        }
-
-        public void RunClient()
-        {
-
-        }
-
-        private void SendToClient()
-        {
-
+            byte[] msg = Encoding.ASCII.GetBytes(str);
+            clSock.Send(msg);
         }
 
         public void EchoHandler()
         {
+            EchoService echoService = new EchoService();
+
             //using Sockets
-
-            try
-            {
-                IPEndPoint remoteIPEndPoint = clSock.RemoteEndPoint as IPEndPoint;
-                IPEndPoint localIPEndPoint = clSock.LocalEndPoint as IPEndPoint;
-
-                byte[] buffer = new byte[1024];
-                while (clSock.Receive(buffer) > 0)
-                {
-                    string str = Encoding.ASCII.GetString(buffer);
-                    int i = str.IndexOf('\0');
-                    str = str.Substring(0, i);
-                    string[] commandArray = str.Split(' ');
-                    if (commandArray[0] == "Echo" || commandArray[0] == "echo")
-                    {
-                        str = Echo(commandArray[1]);
-                    }
-                    else if (commandArray[0] == "EchoUpper" || commandArray[0] == "echoupper")
-                    {
-                        str = EchoUpper(commandArray[1]);
-                    }
-                    else
-                    {
-                        str = "Invalid Command";
-                    }
-                    byte[] msg = Encoding.ASCII.GetBytes(str);
-                    clSock.Send(msg);
-                }
-                clSock.Shutdown(SocketShutdown.Both);
-                clSock.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-            //using Tcp
 
             //try
             //{
-            //    reader = new StreamReader(client.GetStream());
-            //    writer = new StreamWriter(client.GetStream());
-            //    writer.AutoFlush = true;
+            //    IPEndPoint remoteIPEndPoint = clSock.RemoteEndPoint as IPEndPoint;
+            //    IPEndPoint localIPEndPoint = clSock.LocalEndPoint as IPEndPoint;
 
-            //    while (true)
+            //    byte[] buffer = ReceiveFromClient();
+            //    while (buffer.Length > 0)
             //    {
-            //        string msg = reader.ReadLine();
-            //        string[] commandArray = msg.Split(' ');
+            //        string str = Encoding.ASCII.GetString(buffer);
+            //        int i = str.IndexOf('\0');
+            //        str = str.Substring(0, i);
+            //        string[] commandArray = str.Split(' ');
             //        if (commandArray[0] == "Echo" || commandArray[0] == "echo")
             //        {
-            //            msg = Echo(commandArray[1]);
+            //            str = EchoService.Echo(commandArray[1]);
             //        }
             //        else if (commandArray[0] == "EchoUpper" || commandArray[0] == "echoupper")
             //        {
-            //            msg = EchoUpper(commandArray[1]);
+            //            str = EchoService.EchoUpper(commandArray[1]);
             //        }
             //        else
             //        {
-            //            msg = "Invalid Command";
+            //            str = "Invalid Command";
             //        }
-            //        writer.WriteLine(msg);
+            //        SendToClient(str);
+            //        buffer = ReceiveFromClient();
             //    }
+            //    clSock.Shutdown(SocketShutdown.Both);
+            //    clSock.Close();
             //}
             //catch (Exception e)
             //{
             //    Console.WriteLine(e.Message);
             //}
-        }
 
-        public string Echo(string input)
-        {
-            return input;
-        }
+            //using Tcp
 
-        public string EchoUpper(string input)
-        {
-            return input.ToUpper();
+            try
+            {
+                reader = new StreamReader(client.GetStream());
+                writer = new StreamWriter(client.GetStream());
+                writer.AutoFlush = true;
+
+                while (true)
+                {
+                    string msg = reader.ReadLine();
+                    string[] commandArray = msg.Split(' ');
+                    if (commandArray[0] == "Echo" || commandArray[0] == "echo")
+                    {
+                        msg = echoService.Echo(commandArray[1]);
+                    }
+                    else if (commandArray[0] == "EchoUpper" || commandArray[0] == "echoupper")
+                    {
+                        msg = echoService.EchoUpper(commandArray[1]);
+                    }
+                    else if (commandArray[0] == "EchoLast")
+                    {
+                        msg = echoService.EchoLast();
+                    }
+                    else
+                    {
+                        msg = "Invalid Command";
+                    }
+                    writer.WriteLine(msg);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }
